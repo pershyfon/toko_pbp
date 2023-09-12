@@ -1,5 +1,5 @@
 Sabrina Aviana Dewi - 2206030520
-Link Deploy: https://tokopbpsabrina.adaptable.app/
+Link Deploy: https://tokopbpsabrina.adaptable.app/main/
 
 # Langkah Implementasi Checklist
 ## Membuat Proyek Django
@@ -296,6 +296,29 @@ urlpatterns = [
     git commit -m "menambahkan README.md"
     git push -u origin master
     ```
+## Membuat Testing Django
+Mengisi tests.py pada direktori main dengan:
+```shell
+from django.test import TestCase, Client
+
+class MainTest(TestCase):
+    # test URL
+    def test_main_url_is_exist(self):
+        response = Client().get('/main/')
+        self.assertEqual(response.status_code,200)
+
+    # test views
+    def test_main_using_item_template(self):
+        response = Client().get('/main/')
+        self.assertTemplateUsed(response, 'main.html')
+
+    # test HTML
+    def test_template_has_checklist(self):
+        response = Client().get('/main/')
+        self.assertContains(response, 'App Name: ', html=True)
+        self.assertContains(response, 'Name: ', html=True)
+        self.assertContains(response, 'Class: ', html=True)
+```
 
 # Bagan Request Client ke Web Aplikasi
 Bagan:
@@ -322,7 +345,7 @@ Controller: Menghubungkan model dan view, mengendalikan alur logika bisnis, dan 
 
 ## MVT (Model-View-Template, digunakan dalam Django):
 Model: Bertanggung jawab untuk mengelola data aplikasi dan berinteraksi dengan database
-View: Menangani permintaan dari klien, mengambil data dari model, dan merender template dengan menggunakan data ini. View berperan sebagai pengontrol logika bisnis (tidak memiliki controller terpisah)
+View: Menangani permintaan dari klien, mengambil data dari model, dan merender template dengan menggunakan data ini. View berperan sebagai pengontrol logika bisnis (tidak memiliki controller terpisah
 Template: Mengontrol tampilan dan struktur halaman web. Template adalah berkas HTML yang dapat diisi dengan data oleh view
 
 ## MVVM (Model-View-ViewModel):
