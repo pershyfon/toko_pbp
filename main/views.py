@@ -4,7 +4,11 @@ def show_main(request):
     context = {
         'app name': 'main',
         'name': 'Sabrina Aviana Dewi',
-        'class': 'PBP C'
+        'class': 'PBP C',
+        'item name': 'Bubbly Eau de Toilette',
+        'amount': '30',
+        'price': '300000',
+        'description': 'Experience the light, powdery, and clean scent of freshly laundered linens in a bottle.',
     }
 
     return render(request, "main.html", context)
