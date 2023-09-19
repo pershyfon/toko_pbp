@@ -1,8 +1,150 @@
 Sabrina Aviana Dewi - 2206030520
-Link Deploy: https://tokopbpsabrina.adaptable.app/main/
 
-# Langkah Implementasi Checklist
-## Membuat Proyek Django
+# PBP Tugas 3
+## Apa perbedaan antara form POST dan form GET dalam Django?
+POST | GET
+--- | ---
+Mengirim data ke server untuk diproses | Mengambil atau mengembalikan data dari server tanpa memproses/mengubah status
+Mengirimkan data langsung ke action untuk ditampung tanpa menampilkan data pada URL | Menampilkan data pada URL kemudian ditampung oleh action
+Menggunakan variabel $_POST untuk menampung data | Menggunakan variabel $_GET untuk menampung data
+Pengambilan variabel dengan request.POST.get | Pengambilan variabel dengan request.GET.get
+Data tidak terbatas | Data tidak boleh lebih dari 2407 karakter
+Lebih aman | Kurang aman
+Input data menggunakan form | Input data melalui link
+Untuk data penting seperti password | Untuk data tidak penting
+Tidak dapat disimpan dalam cache | Dapat disimpan dalam cache browser
+URL tidak bisa di-bookmark atau dibagikan | URL bisa di-bookmark atau dibagikan
+
+## Apa perbedaan utama antara XML, JSON, dan HTML dalam konteks pengiriman data?
+XML | JSON | HTML
+--- | --- | ---
+Digunakan untuk menyimpan, mendefinisikan, mengatur, dan mentransfer data | Digunakan untuk transfer data | Digunakan untuk menampilkan susunan depan laman
+Tidak mendukung tipe data array | Mendukung tipe data array | Mendukung tipe data array sesuai framework yang digunakan
+Menggunakan tag pembuka dan penutup | Lebih sederhana karena tidak menggunakan tag | Menggunakan tag pembuka dan penutup
+Struktur pohon | Struktur pasangan kunci-nilai | Struktur pohon
+Syntax bertele-tele, menggunakan tag, dan susah dibaca | Syntax sederhana, padat, dan mudah dibaca | Syntax terdapat banyak tag
+Memerlukan pengurai XML | Bisa diurai dengan fungsi JavaScript standar | Bisa diurai dengan berbagai bahasa pemrograman menggunakan library & framework yang tersedia
+Ada comments | Tidak ada comments | Ada comments
+Mendukung lebih banyak jenis encoding | Hanya mendukung encoding UTF-8 | Mendukung banyak jenis encoding
+
+## Mengapa JSON sering digunakan dalam pertukaran data antara aplikasi web modern?
+Karena lebih ringan, sederhana, mudah ditulis, mudah dibaca, dan mudah diuji, baik oleh manusia maupun komputer. JSON didukung oleh hampir semua bahasa pemrograman, seperti JavaScript, Python, Java, PHP, dll. Setiap bahasa pemrograman tersebut menyediakan pustaka bawaan atau pihak ketiga untuk mengurai (deserialize) dan menghasilkan (serialize) data JSON dengan mudah.
+
+JSON mendukung tipe data array sehingga transfer data dapat dilakukan secara terstruktur dan teratur, yang mana sangat penting dalam pengembangan aplikasi web modern yang kompleks. JSON juga memungkinkan pembaruan data secara parsial, yaitu pengembang dapat mengirimkan hanya sebagian data yang berubah
+
+## Screenshot Postman
+![view html](https://imgbox.com/RTQBMeWZ)
+![view xml](https://imgbox.com/y01Sm6uK)
+![view json](https://imgbox.com/lBgQNLlC)
+![view xml by id](image.png)
+![view json by id](image-1.png)
+
+## Langkah Implementasi Checklist
+### Membuat input form
+Membuat berkas forms.py pada direktori main dengan isi:
+```shell
+from django.forms import ModelForm
+from main.models import Item
+
+class ItemForm(ModelForm):
+    class Meta:
+        model = Item
+        fields = ["name", "price", "amount", "description"]
+```
+### Menambahkan 5 fungsi views untuk melihat objek
+1. Mengubah fungsi show_main di views.py direktori main menjadi:
+    ```shell
+    def show_main(request):
+        items = Item.objects.all()
+        context = {
+            'app_name': 'main',
+            'name': 'Sabrina Aviana Dewi',
+            'class': 'PBP C',
+            'items': items
+        }
+
+        return render(request, "main.html", context)
+    ```
+2. Menambahkan fungsi show_xml, show_json, show_xml_by_id, dan show_json_by_id di views.py direktori main dengan:
+    ```shell
+    def show_xml(request):
+        data = Item.objects.all()
+        return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
+
+    def show_json(request):
+        data = Item.objects.all()
+        return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+
+    def show_xml_by_id(request, id):
+        data = Item.objects.filter(pk=id)
+        return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
+
+    def show_json_by_id(request, id):
+        data = Item.objects.filter(pk=id)
+        return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+    ```
+### Membuat routing URL masing-masing views
+1. Menambahkan import di urls.py direktori main
+    ```shell
+    from main.views import show_main, create_item, show_xml, show_json, show_xml_by_id, show_json_by_id
+    ```
+2. Menambahkan path di urlpatterns
+    ```shell
+    ...
+    path('xml/', show_xml, name='show_xml'),
+    path('json/', show_json, name='show_json'),
+    path('xml/<int:id>/', show_xml_by_id, name='show_xml_by_id'),
+    path('json/<int:id>/', show_json_by_id, name='show_json_by_id'), 
+    ...
+    ```
+### Akses URL pada Postman
+1. Masukkan satu-satu link berikut di GET, lalu send
+http://localhost:8000
+http://localhost:8000/xml/
+http://localhost:8000/json/
+http://localhost:8000/xml/1
+http://localhost:8000/json/1
+
+### Bonus fitur pesan
+1. Menyimpan item yang ditambahkan ke variabel item_terakhir di views.py direktori main
+    ```shell
+    if items:
+        item_terakhir = items.last()
+    else:
+        item_terakhir = None
+    ```
+2. Menambahkan item_terakhir ke context di fungsi show_main views.py direktori main
+    ```
+    ...
+    'item_terakhir': item_terakhir,
+    ...
+    ```
+3. Menambahkan kode berikut di atas tabel di main.html:
+    ```shell
+    {% if item_terakhir %}
+    <h2>Kamu menyimpan {{ item_terakhir.amount }} {{ item_terakhir.name }} pada aplikasi ini</h2>
+    {% endif %}
+    ```
+
+### Add, commit, push ke Github
+Memperbarui repositori Github dengan menjalankan kode berikut di command prompt (virtual environment aktif dan di direktori toko_pbp):
+    ```shell
+    git add .
+    git commit -m "tugas 3 selesai"
+    git push -u origin master
+    ```
+
+referensi:
+https://gist.github.com/rririanto/442f0590578ca3f8648aeba1e25f8762
+https://www.dumetschool.com/blog/Perbedaan-Metode-POST-Dan-GET
+https://aws.amazon.com/id/compare/the-difference-between-json-xml/
+
+
+
+# PBP Tugas 2
+Link Deploy: https://tokopbpsabrina.adaptable.app/main/
+## Langkah Implementasi Checklist
+### Membuat Proyek Django
 1. Membuat direktori baru dengan nama proyek toko_pbp
 2. Membuat virtual environment di command prompt dengan menjalankan perintah:
     ```shell
@@ -36,7 +178,7 @@ Link Deploy: https://tokopbpsabrina.adaptable.app/main/
     ...
     ```
 
-## Inisiasi Repositori Github
+### Inisiasi Repositori Github
 1. Menambahkan berkas .gitignore pada direktori toko_pbp (bukan direktori proyek) dengan kode berikut:
     ```shell
     # Django
@@ -186,7 +328,7 @@ Link Deploy: https://tokopbpsabrina.adaptable.app/main/
     git push -u origin master
     ```
 
-## Membuat Aplikasi Main
+### Membuat Aplikasi Main
 1. Masih dalam virtual environment dan direktori 'toko_pbp', membuat aplikasi baru bernama 'main' dengan perintah:
     ```shell
     python manage.py startapp main
@@ -200,7 +342,7 @@ Link Deploy: https://tokopbpsabrina.adaptable.app/main/
     ]
     ```
 
-## Membuat Model Aplikasi Main
+### Membuat Model Aplikasi Main
 1. Mengisi berkas models.py pada direktori aplikasi main dengan kode:
     ```shell
     from django.db import models
@@ -220,7 +362,7 @@ Link Deploy: https://tokopbpsabrina.adaptable.app/main/
     python manage.py migrate
     ```
 
-## Membuat Fungsi views.py untuk Dikembalikan ke Template HTML
+### Membuat Fungsi views.py untuk Dikembalikan ke Template HTML
 1. Membuat direktori templates di dalam direktori aplikasi main
 2. Membuat berkas main.html di dalam direktori templates. main.html memuat hal-hal yang akan ditampilkan pada aplikasi
 3. Mengisi views.py pada direktori aplikasi main dengan:
@@ -241,7 +383,7 @@ Link Deploy: https://tokopbpsabrina.adaptable.app/main/
         return render(request, "main.html", context)
     ```
 
-## Routing urls.py Aplikasi Main
+### Routing urls.py Aplikasi Main
 Membuat berkas urls.py di dalam direktori main dengan kode berikut:
 ```shell
 from django.urls import path
@@ -254,7 +396,7 @@ urlpatterns = [
 ]
 ```
 
-## Routing URL Proyek untuk Menjalankan Main
+### Routing URL Proyek untuk Menjalankan Main
 Mengisi urls.py di direktori proyek toko_pbp dengan kode berikut:
 ```shell
 from django.contrib import admin
@@ -265,7 +407,7 @@ urlpatterns = [
     path('main/', include('main.urls')),
 ]
 ```
-## Melakukan Deployment ke Adaptable
+### Melakukan Deployment ke Adaptable
 1. Memperbarui repositori Github dengan menjalankan kode berikut di command prompt (masih di virtual environment dan direktori toko_pbp):
     ```shell
     git add .
@@ -288,7 +430,7 @@ urlpatterns = [
 12. Centang HTTP Listener on PORT
 13. Klik Deploy App
 
-## Membuat README.md
+### Membuat README.md
 1. Buat berkas README.md di direktori toko_pbp berisi permintaan soal
 2. Memperbarui ke Github dengan menjalankan perintah:
     ```shell
@@ -296,7 +438,7 @@ urlpatterns = [
     git commit -m "menambahkan README.md"
     git push -u origin master
     ```
-## Membuat Testing Django
+### Membuat Testing Django
 Mengisi tests.py pada direktori main dengan:
 ```shell
 from django.test import TestCase, Client
@@ -320,35 +462,35 @@ class MainTest(TestCase):
         self.assertContains(response, 'Class: ', html=True)
 ```
 
-# Bagan Request Client ke Web Aplikasi
+## Bagan Request Client ke Web Aplikasi
 Bagan:
 ![bagan](https://images2.imgbox.com/cb/7a/zoczTbst_o.png)
 
 Kaitan antara urls.py, views.py, models.py, dan berkas html:
 HTTP Request datang dari client dan akan dicocokkan dengan pola URL yang telah didefinisikan dalam urls.py. Kemudian urls.py mengarahkan permintaan ke views.py yang sesuai untuk menangani permintaan tersebut. View (views.py) mengambil alih permintaan dan dapat berinteraksi dengan mengambil data model.py untuk mengakses atau memanipulasi database. views.py merender berkas HTML (template) dengan menggunakan data yang telah diproses. Template HTML menghasilkan halaman web yang akan dikirimkan sebagai HTTP Response kepada client, yang akhirnya akan dilihat oleh pengguna pada halaman web.
 
-# Kenapa menggunakan virtual environment? 
+## Kenapa menggunakan virtual environment? 
 Virtual environment berguna untuk mengisolasi package serta dependensi dari aplikasi sehingga tidak bertabrakan dengan versi lain yang ada pada komputer. Virtual environment ini juga berguna untuk memastikan kalau versi dari sebuah library yang digunakan di satu project tidak akan berubah apabila kita melakukan sebuah update di library yang sama di project lainnya. 
 
 Dengan virtual environment, maka proyek dapat berjalan sesuai dependensinya tanpa melakukan konfigurasi pada sistem operasi yang digunakan dan hanya perlu menggunakan requirements.txt  sebagai pencatatan daftar dependensi dari suatu proyek yang dijalankan dalam virtual environment tertentu agar mesin host (seperti Adaptable) dapat mengetahui apa saja dependensinya.
 
-# Apakah kita tetap dapat membuat aplikasi web berbasis Django tanpa menggunakan virtual environment?
+## Apakah kita tetap dapat membuat aplikasi web berbasis Django tanpa menggunakan virtual environment?
 Kita tetap dapat membuat aplikasi web berbasis Django tanpa menggunakan virtual environment, namun dianjurkan menggunakan environment agar versi dari sebuah library yang digunakan di satu project tidak akan berubah apabila kita melakukan sebuah update di library yang sama di project lain-nya. 
 
 Ketika dijalankan di online hoster tanpa virtual environment juga cukup susah karena server host akan mencari daftar dependensi yang ada di dalam "requirements.txt" untuk disesuaikan dengan paket dependensi yang dimiliki mesin hosting.
 
-# MVC, MVT, MVVM dan Perbedaan Ketiganya
-## MVC (Model-View-Controller):
+## MVC, MVT, MVVM dan Perbedaan Ketiganya
+### MVC (Model-View-Controller):
 Model: Bertanggung jawab untuk mengatur data dan logika bisnis aplikasi
 View: Menampilkan informasi kepada pengguna dan mengirim perubahan ke model
 Controller: Menghubungkan model dan view, mengendalikan alur logika bisnis, dan menangani permintaan dari pengguna
 
-## MVT (Model-View-Template, digunakan dalam Django):
+### MVT (Model-View-Template, digunakan dalam Django):
 Model: Bertanggung jawab untuk mengelola data aplikasi dan berinteraksi dengan database
 View: Menangani permintaan dari klien, mengambil data dari model, dan merender template dengan menggunakan data ini. View berperan sebagai pengontrol logika bisnis (tidak memiliki controller terpisah
 Template: Mengontrol tampilan dan struktur halaman web. Template adalah berkas HTML yang dapat diisi dengan data oleh view
 
-## MVVM (Model-View-ViewModel):
+### MVVM (Model-View-ViewModel):
 Model: Bertanggung jawab untuk mengelola data dan logika bisnis
 View: Menampilkan data kepada pengguna
 ViewModel: Berfungsi sebagai perantara antara model dan view. Ini mengelola tampilan data dan berinteraksi dengan model

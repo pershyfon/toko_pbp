@@ -1,28 +1,46 @@
-<h1>Toko PBP</h1>
+{% extends 'base.html' %}
 
-<h5>App Name: </h5>
-<p>{{ app_name }}</p>
-<h5>Name: </h5>
-<p>{{ name }}</p>
-<h5>Class: </h5>
-<p>{{ class }}</p>
-<br>
-</body>
-</html>
-<table border="1" cellpadding="10">
-    <tr>
-        <th>Item Name</th>
-        <th>Amount</th>
-        <th>Price</th>
-        <th>Description</th>
-    </tr>
-    <tr>
-        <td><center>{{ item_name }}</center></td>
-        <td><center>{{ amount }}</center></td>
-        <td><center>{{ price }}</center></td>
-        <td><center>{{ description }}</center></td>
-    </tr>
-</table>
+{% block content %}
+    <h1>Toko PBP</h1>
 
-</body>
-</html>
+    <h5>App Name: </h5>
+    <p>{{ app_name }}</p>
+    <h5>Name: </h5>
+    <p>{{ name }}</p>
+    <h5>Class: </h5>
+    <p>{{ class }}</p>
+    <br>
+
+    {% if item_terakhir %}
+    <h2>Kamu menyimpan {{ item_terakhir.amount }} {{ item_terakhir.name }} pada aplikasi ini</h2>
+    {% endif %}
+
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Amount</th>
+            <th>Description</th>
+        </tr>
+
+        {% comment %} Berikut cara memperlihatkan data produk di bawah baris ini {% endcomment %}
+
+        {% for item in items %}
+            <tr>
+                <td>{{item.name}}</td>
+                <td>{{item.price}}</td>
+                <td>{{item.amount}}</td>
+                <td>{{item.description}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <br />
+
+    <a href="{% url 'main:create_item' %}">
+        <button>
+            Add New Item
+        </button>
+    </a>
+
+{% endblock content %}
