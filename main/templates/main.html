@@ -5,15 +5,18 @@
 
     <h5>App Name: </h5>
     <p>{{ app_name }}</p>
-    <h5>Name: </h5>
-    <p>{{ name }}</p>
+    <h5>Logged In User: </h5>
+    <p>{{ username }}</p>
     <h5>Class: </h5>
     <p>{{ class }}</p>
-    <br>
 
-    {% if item_terakhir %}
-    <h2>Kamu menyimpan {{ item_terakhir.amount }} {{ item_terakhir.name }} pada aplikasi ini</h2>
-    {% endif %}
+    <h4>Kamu menyimpan {{ jumlah_items }} item pada aplikasi ini</h4>
+
+    {% if messages %}
+        {% for message in messages %}
+            <h5>{{ message }}</h5>
+        {% endfor %}
+    {% endif %}    
 
     <table border="1">
         <tr>
@@ -21,6 +24,9 @@
             <th>Price</th>
             <th>Amount</th>
             <th>Description</th>
+            <th>Add 1</th>
+            <th>Remove 1</th>
+            <th>Delete</th>
         </tr>
 
         {% comment %} Berikut cara memperlihatkan data produk di bawah baris ini {% endcomment %}
@@ -31,15 +37,39 @@
                 <td>{{item.price}}</td>
                 <td>{{item.amount}}</td>
                 <td>{{item.description}}</td>
+                <td><a href="{% url 'main:add' item.id %}">
+                    <button>
+                        Add
+                    </button>
+                    </a>
+                </td>
+                <td><a href="{% url 'main:remove' item.id %}">
+                    <button>
+                        Remove
+                    </button>
+                    </a>
+                </td>
+                <td><a href="{% url 'main:delete' item.id %}">
+                    <button>
+                        Delete
+                    </button>
+                    </a>
+                </td>
             </tr>
         {% endfor %}
     </table>
 
-    <br />
+    <h5>Sesi terakhir login: {{ last_login }}</h5>
 
     <a href="{% url 'main:create_item' %}">
         <button>
             Add New Item
+        </button>
+    </a>
+
+    <a href="{% url 'main:logout' %}">
+        <button>
+            Logout
         </button>
     </a>
 

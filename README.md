@@ -1,5 +1,100 @@
 Sabrina Aviana Dewi - 2206030520
 
+# PBP Tugas 4
+## Apa itu Django UserCreationForm, dan jelaskan apa kelebihan dan kekurangannya?
+Django UserCreationForm adalah sistem otentikasi bawaan Django yang mengirim permintaan POST untuk membuat pengguna baru. is_superuser dan is_staff disetel False, namun is_active disetel True. Untuk menggunakan UserCreationForm, kita perlu mengimpornya dari Django.contrib.auth.forms. 
+
+Kekurangan Django UserCreationForm: 
+1. Bidangnya terbatas, yakni hanya ada nama pengguna, kata sandi, dan konfirmasi kata sandi.
+2. Tidak ada fitur lain, seperti profil pengguna atau validasi yang lebih kompleks.
+3. Tampilannya sederhana.
+
+Kelebihan Django UserCreationForm:
+1. Mudah & praktis untuk digunakan.
+2. Sudah memvalidasi kata sandi dan memeriksa apakah nama pengguna sudah ada sebelumnya.
+3. Terintegrasi dengan model User Django sehingga data yang dimasukkan ke formulir akan langsung disimpan ke penyimpanan data pengguna di basis data
+4. Mendukung kustomisasi sesuai kebutuhan untuk melengkapi kekurangan-kekurangan di atas
+
+## Apa perbedaan antara autentikasi dan otorisasi dalam konteks Django, dan mengapa keduanya penting?
+Autentikasi: Verifikasi bahwa pengguna adalah benar-benar siapa yang mereka klaim
+Otorisasi: Pengaturan izin untuk pengguna, apa saja yang dapat dilakukan oleh pengguna terautentikasi
+Keduanya penting untuk menjaga keamanan data pengguna dan menghindari penyalahgunaan atau akses tidak sah ke fitur/bagian tertentu. Pengaturan izin selain berfungsi untuk keamanan dan privasi, juga untuk meningkatkan pengalaman pengguna untuk hanya dapat mengakses bagian yang relevan dengan kebutuhan mereka.
+
+## Apa itu cookies dalam konteks aplikasi web, dan bagaimana Django menggunakan cookies untuk mengelola data sesi pengguna?
+Cookies adalah informasi berisi identifikasi dan rekam jejak pengguna yang sedang mengakses aplikasi web sebagai cara melakukan holding state. Holding state adalah proses memberi tahu siapa yang mengakses web tanpa terus-terusan login pada aplikasi web yang sama. Cookies memiliki tanggal kedaluwarsa dan akan terhapus otomatis jika sudah kedaluwarsa. Yang disimpan di cookies hanyalah session ID, yaitu suatu token (barisan karakter) untuk mengenali session yang unik pada aplikasi web tertentu..
+
+Django menggunakan cookies untuk mengelola data sesi pengguna dengan menggunakan modul django.contrib.sessions.middleware.SessionMiddleware. Pada sesi pertama, Django membuat string acak unik sepanjang 32 karakter yang disebut kunci sesi dan mengaitkannya dengan data sesi. Data sesi ini dikirim dari server ke browser klien untuk disimpan sebagai cookies. Setiap pengguna melakukan permintaan, browser akan mengirimkan cookies bersama permintaan ke server Django. Kemudian akan kunci sesi digunakan untuk mengambil data sesi pengguna yang sesuai dari penyimpanan sesi (default-nya menggunakan basis data).
+
+## Apakah penggunaan cookies aman secara default dalam pengembangan web, atau apakah ada risiko potensial yang harus diwaspadai?
+Umumnya cookies tidak berbahaya dalam pengembangan web. Dalam kondisi normal, cookies tidak bisa men-transfer malware atau virus. Kecil kemungkinan untuk data hilang melalui cookies. Cookies dari suatu web juga tidak bisa dialihkan ke web lain. Namun, tetap harus hati-hati untuk tidak memberikan cookies ke sembarang web. Jangan lupa untuk hapus cookies secara berkala atau ketika mengakses lewat komputer publik. Penting juga untuk memastikan bahwa data dienkripsi dengan baik sebelum disimpan dalam cookies. Atur atribut HTTPOnly, secure flag, domain, path, session, dan perlindungan CSRF jika diperlukan.
+
+
+## Langkah Implementasi Checklist
+### Mengimplementasikan fungsi registrasi, login, dan logout untuk memungkinkan pengguna untuk mengakses aplikasi sebelumnya dengan lancar.
+1. Membuat fungsi register menggunakan UserCreationForm, login_user yang menge-set cookie, dan logout_user yang menghapus cookie di views.py aplikasi main
+2. Membuat template register.html dan login.html untuk tampilan halaman register dan halaman login
+3. Membuat pathnya di urls.py aplikasi main
+4. Mengimport login_required di views.py dan menambahkan login_required sebelum fungsi-fungsi seperti ini:
+    ```shell
+    @login_required(login_url='/login')
+    ```
+
+### Membuat dua akun pengguna dengan masing-masing tiga dummy data menggunakan model yang telah dibuat pada aplikasi sebelumnya untuk setiap akun di lokal.
+Register, login, dan add item 3x untuk setiap akun
+
+### Menghubungkan model Item dengan User
+1. Mengimport Django User di models.py aplikasi main dan menambahkan atribut user seperti ini:
+    ```shell
+    ...
+    from django.contrib.auth.models import User
+
+    class Item(models.Model):
+        user = models.ForeignKey(User, on_delete=models.CASCADE)
+    ...
+    ```
+2. Menghubungkan item yang baru dibuat dengan user dengan menambahkan kode berikut di if form.is_valid() di fungsi create_item views.py aplikasi main:
+    ```shell
+    ...
+    product.user = request.user
+    ...
+    ```
+
+### Menampilkan detail informasi pengguna yang sedang logged in seperti username dan menerapkan cookies seperti last login pada halaman utama aplikasi
+1. Mengubah context fungsi show_main pada views.py aplikasi main menjadi seperti ini untuk mendapatkan username dan last login:
+    ```shell
+    ...
+    context = {
+        'app_name': 'main',
+        'username': request.user.username,
+        'class': 'PBP C',
+        'items': items,
+        'item_terakhir': item_terakhir,
+        'last_login': request.COOKIES.get('last_login'),
+    }
+    ...
+    ```
+2. Menambahkan kode berikut di main.html untuk menampilkan last login:
+    ```shell
+    <h5>Sesi terakhir login: {{ last_login }}</h5>
+    ```
+
+### Implementasi bonus
+1. Membuat fungsi add_amount, remove_amount, dan delete_item di views.py aplikasi main
+2. Menambahkan path ke fungsi-fungsi tersebut di urls.py aplikasi main
+3. Membuat button yang akan memanggil fungsi-fungsi tersebut jika dipencet di main.html
+
+### Melakukan add, commit, push ke GitHub
+Memperbarui repositori Github dengan menjalankan kode berikut di command prompt (virtual environment aktif dan di direktori toko_pbp):
+    ```shell
+    git add .
+    git commit -m "tugas 4 selesai"
+    git push -u origin master
+    ```
+
+referensi:
+https://www.javatpoint.com/django-usercreationform
+https://stackoverflow.com/questions/37544543/what-is-the-difference-between-authorization-and-authentication-in-django
+
 # PBP Tugas 3
 ## Apa perbedaan antara form POST dan form GET dalam Django?
 POST | GET
@@ -33,11 +128,11 @@ Karena lebih ringan, sederhana, mudah ditulis, mudah dibaca, dan mudah diuji, ba
 JSON mendukung tipe data array sehingga transfer data dapat dilakukan secara terstruktur dan teratur, yang mana sangat penting dalam pengembangan aplikasi web modern yang kompleks. JSON juga memungkinkan pembaruan data secara parsial, yaitu pengembang dapat mengirimkan hanya sebagian data yang berubah
 
 ## Screenshot Postman
-![view html](https://imgbox.com/RTQBMeWZ)
-![view xml](https://imgbox.com/y01Sm6uK)
-![view json](https://imgbox.com/lBgQNLlC)
-![view xml by id](image.png)
-![view json by id](image-1.png)
+![view html](https://images2.imgbox.com/2c/05/RTQBMeWZ_o.png)
+![view xml](https://images2.imgbox.com/de/bc/y01Sm6uK_o.png)
+![view json](https://images2.imgbox.com/a9/6f/lBgQNLlC_o.png)
+![view xml by id](https://images2.imgbox.com/98/40/4qFfgsNL_o.png)
+![view json by id](https://images2.imgbox.com/ba/5d/XPNlnUMJ_o.png)
 
 ## Langkah Implementasi Checklist
 ### Membuat input form
