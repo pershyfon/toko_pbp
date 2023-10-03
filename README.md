@@ -1,5 +1,98 @@
 Sabrina Aviana Dewi - 2206030520
 
+# PBP Tugas 5
+## Manfaat Element Selector dan Waktu Penggunaan yang Tepat
+Element selector digunakan supaya kita dapat melakukan kustomisasi seragam untuk setiap elemen dengan nama elemen tertentu, misal font atau warna latar belakang. Element selector juga dapat meningkatkan keterbacaan kode dan keefisiensian waktu ketika mengatur tampilan. Gaya yang telah diatur akan dapat diterapkan pada elemen-elemen dengan nama elemen yang sama. Element selector digunakan ketika ingin mengubah tampilan umum atau standar dari suatu elemen yang tidak memerlukan class atau ID spesifik.
+
+## HTML5 Tag
+```shell
+<!DOCTYPE>: menunjukkan tipe dokumen seperti <!DOCTYPE html>
+<a>: anchor adalah teks penanda awalan dan akhiran sebuah hypertext link
+<button>: penanda button
+<header>, <body>, <p> <footer>, : penanda header, body,paragraph, dan footer dari dokumen
+<title>: penanda judul
+<div>: penanda sebuah section
+<h1> - <h6>: penanda header1 - header6 yang berupa ukuran dan ketebalan font sebagai header
+<img>: penanda gambar
+<label>: penanda label
+<nav>: penanda navigation bar
+<table>: penanda tabel
+<th>: penanda header tabel
+<td>: penanda tabel cell
+<tr>: penanda baris tabel
+<ul>: penanda unordered list
+<li>: penanda item list
+```
+
+## Perbedaan Margin dan 
+Margin | Padding
+--- | ---
+Jarak sekitar elemen dari sisi luar atau dengan elemen lain di sekitarnya | Jarak sekitar elemen dari sisi dalam atau dengan konten di dalamnya
+Tidak memiliki latar belakang atau warna sendiri dan merupakan area transparan yang memisahkan elemen dari elemen-elemen lainnya | Memiliki latar belakang dan warna yang sama dengan elemen itu sendiri
+Misalnya, menambahkan jarak antara dua elemen HTML, bisa dengan mengatur margin salah satu elemen atau keduanya | Misalnya, untuk membuat teks dalam elemen HTML terlihat lebih lega dari tepi elemen
+
+
+## Perbedaan Framework CSS Tailwind dan Bootstrap
+Tailwind | Bootstrap
+--- | ---
+Pendekatan "utility-first", di mana kita membangun antarmuka dengan menggabungkan class utilitas yang lebih kecil | Pendekatan "component-driven", di mana set class CSS dan komponen telah dirancang sebelumnya dengan tampilan yang cukup terstruktur dan konsisten
+Kustomisasi tidak terbatas | Kustomisasi terbatas
+File lebih ringan | File lebih berat karena menyediakan banyak fitur dan komponen siap pakai
+Tidak menyertakan JavaScript sehingga perlu menulis JavaScript tambahan atau menggunakan framwork terpisah | Menyertaka JavaScript untu beberapa fitur sepertu modals, dropdowns, dan tab
+
+### Kapan sebaiknya kita menggunakan Bootstrap daripada Tailwind, dan sebaliknya?
+Bootstrap cocok untuk proyek dengan tenggat waktu yang ketat dan komponen pra-dibangun yang banyak. Bootstrap cocok untuk proyek dengan desain tradisional yang membutuhkan kerangka kerja yang stabil dan mudah digunakan. Dokumentasi Bootstrap yang kuat akan mempermudah mendapatkan sumber daya.
+
+Tailwind memberi lebih banyak kendali dan fleksibilitas dalam desain sehingga cocok untuk proyek yang tampilan dan gayanya ingin diubah sesuai keinginan dengan mendefinisikan kelas CSS sendiri. Tailwind juga lebih baik digunakan ketika proyek membutuhkan kode CSS yang lebih ringan.
+
+## Langkah Implementasi Checklist
+1. Menambahkan style pada create_item.html, login.html, main.html, dan register.html direktori main.
+2. Inventori di main.html ditampilkan menggunakan card
+    ```shell
+    <div class="product">
+        {% for item in items %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{item.name}}</h5>
+                    <p class="card-text">{{item.description}}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item flex-v">Amount: {{item.amount}}
+                        <div>
+                            <a href="{% url 'main:add' item.id %}">
+                                <button class="secondary-button">
+                                    Add
+                                </button>
+                            </a>
+                            <a href="{% url 'main:remove' item.id %}">
+                                <button class="secondary-button">
+                                    Remove
+                                </button>
+                            </a>
+                        </div>
+                    </li>
+                    <li class="list-group-item">Price: {{item.price}}</li>
+                </ul>
+                <div class="card-body">
+                    <a href="{% url 'main:delete' item.id %}">
+                        <button class="primary-button">Delete</button>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    ```
+3. Mengerjakan bonus dengan menambahkan kode berikut di style main.html
+    ```shell
+    .card:last-child, .card:last-child .flex-v {
+        background: #1569C7;
+    }
+    ```
+
+Referensi:
+https://codepolitan.com/blog/perbedaan-bootstrap-dan-tailwind
+https://getbootstrap.com/docs/4.0/components/card/
+
 # PBP Tugas 4
 ## Apa itu Django UserCreationForm, dan jelaskan apa kelebihan dan kekurangannya?
 Django UserCreationForm adalah sistem otentikasi bawaan Django yang mengirim permintaan POST untuk membuat pengguna baru. is_superuser dan is_staff disetel False, namun is_active disetel True. Untuk menggunakan UserCreationForm, kita perlu mengimpornya dari Django.contrib.auth.forms. 

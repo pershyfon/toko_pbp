@@ -1,76 +1,166 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Toko PBP</h1>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: sans-serif;
+    }
 
-    <h5>App Name: </h5>
-    <p>{{ app_name }}</p>
-    <h5>Logged In User: </h5>
-    <p>{{ username }}</p>
-    <h5>Class: </h5>
-    <p>{{ class }}</p>
+    body {
+        height: 100vh;
+        background: #e7a180;
+    }
 
-    <h4>Kamu menyimpan {{ jumlah_items }} item pada aplikasi ini</h4>
+    nav {
+        position: absolute;
+        background: #ffffff;
+        top: 0;
+        left: 0;
+        padding: 0 80px;
+        width: 100%;
+        box-sizing: border-box;
+    }
 
-    {% if messages %}
-        {% for message in messages %}
-            <h5>{{ message }}</h5>
-        {% endfor %}
-    {% endif %}    
+    header {
+        margin: 20px 0;
+        padding: 0 50px;
+        text-align: center;
+    }
 
-    <table border="1">
-        <tr>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Amount</th>
-            <th>Description</th>
-            <th>Add 1</th>
-            <th>Remove 1</th>
-            <th>Delete</th>
-        </tr>
+    footer {
+        margin-top: 20px;
+        padding: 0 50px;
+        text-align: center;
+    }
 
-        {% comment %} Berikut cara memperlihatkan data produk di bawah baris ini {% endcomment %}
+    .product {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 0 50px;
+    }
 
+    .card {
+        width: 250px;
+        flex-basis: calc(33.33% - 20px);
+        background: #fff;
+        margin-bottom: 20px; /* Jarak antara kartu */
+    }
+
+    .card:last-child, .card:last-child .flex-v {
+        background: #1569C7;
+    }
+
+    .primary-button,
+    .secondary-button,
+    .btn-outline-success {
+        border: none;
+        outline: none;
+        padding: 8px;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+        text-align: center; /* Mengatur teks ke tengah tombol */
+    }
+
+    .primary-button {
+        width: 100%;
+        background: #d5647c;
+    }
+
+    .secondary-button {
+        width: 15x;
+        background: #d5647c;
+    }
+
+    .btn-outline-success {
+        color: #d5647c;
+        outline-color: #d5647c;
+        background-color: #fff;
+    }
+
+    .btn-outline-success:hover {
+        border-color: #d5647c;
+        background: rgba(231, 161, 176, 1);
+    }
+
+    .flex-v {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+</style>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#"><h3 style="font-family: 'Lucida bright';">TOKO PBP SABRINA</h3></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            </ul>
+            <a href="{% url 'main:logout' %}">
+                <button class="btn btn-outline-success" type="submit">Logout</button>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<body>
+    <header>
+        <h2 style="font-family: 'Lucida bright';">Halo, {{ username }}!</h2>
+        <p>Sesi terakhir login: {{ last_login }}</p>
+        <h4>Kamu menyimpan {{ jumlah_items }} item pada aplikasi ini</h4>
+        {% if messages %}
+            {% for message in messages %}
+                <h5>{{ message }}</h5>
+            {% endfor %}
+        {% endif %}
+    </header>
+    
+    <div class="product">
         {% for item in items %}
-            <tr>
-                <td>{{item.name}}</td>
-                <td>{{item.price}}</td>
-                <td>{{item.amount}}</td>
-                <td>{{item.description}}</td>
-                <td><a href="{% url 'main:add' item.id %}">
-                    <button>
-                        Add
-                    </button>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{item.name}}</h5>
+                    <p class="card-text">{{item.description}}</p>
+                    <p class="card-text">Price: Rp{{item.price}}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item flex-v">Amount: {{item.amount}}
+                        <div>
+                            <a href="{% url 'main:add' item.id %}">
+                                <button class="secondary-button">
+                                    Add
+                                </button>
+                            </a>
+                            <a href="{% url 'main:remove' item.id %}">
+                                <button class="secondary-button">
+                                    Remove
+                                </button>
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+                <div class="card-body">
+                    <a href="{% url 'main:delete' item.id %}">
+                        <button class="primary-button">Delete</button>
                     </a>
-                </td>
-                <td><a href="{% url 'main:remove' item.id %}">
-                    <button>
-                        Remove
-                    </button>
-                    </a>
-                </td>
-                <td><a href="{% url 'main:delete' item.id %}">
-                    <button>
-                        Delete
-                    </button>
-                    </a>
-                </td>
-            </tr>
+                </div>
+            </div>
         {% endfor %}
-    </table>
+    </div>
 
-    <h5>Sesi terakhir login: {{ last_login }}</h5>
-
-    <a href="{% url 'main:create_item' %}">
-        <button>
-            Add New Item
-        </button>
-    </a>
-
-    <a href="{% url 'main:logout' %}">
-        <button>
-            Logout
-        </button>
-    </a>
-
+    <footer>
+        <a href="{% url 'main:create_item' %}">
+            <button class="btn btn-outline-success">Add New Item</button>
+        </a>
+    </footer>
+</body>
 {% endblock content %}
