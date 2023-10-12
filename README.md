@@ -1,6 +1,7 @@
 Sabrina Aviana Dewi - 2206030520
 
 # Link Deploy
+[http://sabrina-aviana-tugas.pbp.cs.ui.ac.id/](http://sabrina-aviana-tugas.pbp.cs.ui.ac.id/)
 
 # Table of Contents
 * [Tugas 2](https://github.com/pershyfon/toko_pbp/blob/master/README.md#pbp-tugas-2)
