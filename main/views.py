@@ -1,5 +1,7 @@
 import datetime
-from django.http import HttpResponseRedirect, Http404
+import json
+
+from django.http import HttpResponseRedirect, Http404, HttpResponseNotFound
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
@@ -13,36 +15,21 @@ from django.db.models import Sum
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
 @login_required(login_url='/login')
 def show_main(request):
-    items = Item.objects.filter(user=request.user)
-    
-    total_amount = Item.objects.filter(user=request.user).aggregate(total_amount=Sum('amount'))['total_amount']
-    jumlah_items = total_amount if total_amount is not None else 0   
+    items = Item.objects.filter(user=request.user) 
 
     context = {
         'app_name': 'main',
         'username': request.user.username,
         'class': 'PBP C',
         'items': items,
-        'jumlah_items': str(jumlah_items),
         'last_login': request.COOKIES.get('last_login'),
     }
 
     return render(request, "main.html", context)
-
-def create_item(request):
-    form = ItemForm(request.POST or None)
-
-    if form.is_valid() and request.method == "POST":
-     product = form.save(commit=False)
-     product.user = request.user
-     product.save()
-     return HttpResponseRedirect(reverse('main:show_main'))
-
-    context = {'form': form}
-    return render(request, "create_item.html", context)
 
 def show_xml(request):
     data = Item.objects.all()
@@ -69,6 +56,8 @@ def register(request):
             form.save()
             messages.success(request, 'Your account has been successfully created!')
             return redirect('main:login')
+        else:
+            messages.error(request, "Your username or password aren't valid!")
     context = {'form':form}
     return render(request, 'register.html', context)
 
@@ -93,39 +82,46 @@ def logout_user(request):
     response.delete_cookie('last_login')
     return response
 
-def add_amount(request, id):
-    try:
-        items = Item.objects.get(pk=id)
-        if request.method == 'GET':
-            items.amount += 1
-            items.save()
-            messages.success(request, 'Sukses Menambah Amount.')
-            return redirect('main:show_main')
-        return redirect('main:show_main')
-    except Item.DoesNotExist:
-        raise Http404("Item tidak ditemukan.")
-    
-def remove_amount(request, id):
-    try:
-        items = Item.objects.get(pk=id)
-        if request.method == 'GET':
-            items.amount -= 1
-            items.save()
-            if items.amount == 0:
-                items.delete()
-            messages.success(request, 'Sukses Mengurangi Amount.')
-            return redirect('main:show_main')
-        return redirect('main:show_main')
-    except Item.DoesNotExist:
-        raise Http404("Item tidak ditemukan.")
+def get_item_json(request):
+  Items = Item.objects.filter(user=request.user)
+  return HttpResponse(serializers.serialize('json', Items))
 
-def delete_item(request, id):
-    try:
-        items = Item.objects.get(pk=id)
-        if request.method == 'GET':
-            items.delete()
-            messages.success(request, 'Sukses Menghapus Item.')
-            return redirect('main:show_main')
-        return redirect('main:show_main')
-    except Item.DoesNotExist:
-        raise Http404("Item tidak ditemukan.")
+@csrf_exempt
+def add_item_ajax(request):
+    if request.method == 'POST':
+        name = request.POST.get("name")
+        price = request.POST.get("price")
+        amount = request.POST.get("amount")
+        description = request.POST.get("description")
+        user = request.user
+
+        new_item = Item(name=name, price=price, amount=amount, description=description, user=user)
+        new_item.save()
+
+        return HttpResponse(b"CREATED", status=201)
+
+    return HttpResponseNotFound()
+
+@csrf_exempt
+def delete_item_ajax(request):
+    data = json.loads(request.body.decode("utf-8"))
+    item = Item.objects.get(pk=data["id"])
+    item.delete()
+    return HttpResponse("DELETED",status=200)
+
+@csrf_exempt
+def add_amount_ajax(request):
+    data = json.loads(request.body.decode("utf-8"))
+    item = Item.objects.get(pk=data["id"])
+    item.amount += 1
+    item.save()
+    return HttpResponse(status=200)
+
+@csrf_exempt
+def remove_amount_ajax(request):
+    data = json.loads(request.body.decode("utf-8"))
+    item = Item.objects.get(pk=data["id"])
+    if item.amount > 1:
+        item.amount -= 1
+        item.save()
+    return HttpResponse(status=200)
