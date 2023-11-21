@@ -4,7 +4,7 @@ import json
 from django.http import HttpResponseRedirect, Http404, HttpResponseNotFound
 from django.shortcuts import render
 from django.shortcuts import redirect
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from main.forms import ItemForm
 from django.http import HttpResponse
 from django.core import serializers
@@ -125,3 +125,34 @@ def remove_amount_ajax(request):
         item.amount -= 1
         item.save()
     return HttpResponse(status=200)
+
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        
+        data = json.loads(request.body)
+
+        new_product = Item.objects.create(
+            user = request.user,
+            name = data["name"],
+            amount = int(data["amount"]),
+            price = int(data["price"]),
+            description = data["description"]
+        )
+
+        new_product.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+    
+def show_json_user(request, username):
+    data_item = Item.objects.all()
+    for data in data_item:
+        if data.user.username == username:
+            user_id = data.user
+            data = Item.objects.filter(user = user_id)
+            break
+        else:
+            data = []
+    return HttpResponse(serializers.serialize("json", data), content_type="application/json")

@@ -1,5 +1,5 @@
 from django.urls import path
-from main.views import show_main, show_xml, show_json, show_xml_by_id, show_json_by_id, register, login_user, logout_user, delete_item_ajax, add_amount_ajax, remove_amount_ajax, get_item_json, add_item_ajax
+from main.views import show_main, show_xml, show_json, show_xml_by_id, show_json_by_id, register, login_user, logout_user, delete_item_ajax, add_amount_ajax, remove_amount_ajax, get_item_json, add_item_ajax, create_product_flutter, show_json_user
 
 app_name = 'main'
 
@@ -18,4 +18,6 @@ urlpatterns = [
     path('delete/', delete_item_ajax, name='delete'), 
     path('get-item/', get_item_json, name='get_item_json'),
     path('create-ajax/', add_item_ajax, name='add_item_ajax'),
+    path('create-flutter/', create_product_flutter, name='create_product_flutter'),
+    path("json-item/<str:uname>/",show_json_user, name="show_json_user"),
 ]
